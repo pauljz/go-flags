@@ -96,3 +96,25 @@ func TestDefaults(t *testing.T) {
 		}
 	}
 }
+
+func TestInitFuncs(t *testing.T) {
+	var TestGroup struct {
+		StringOpt string `short:"s" description:"stuff"`
+	}
+	p := NewParser(&TestGroup, Default)
+	wantStr := "my option"
+	var init bool
+	p.InitFuncs = append(p.InitFuncs, func() {
+		if TestGroup.StringOpt != wantStr {
+			t.Errorf("TestGroup.WantStringOpt != wantStr: (%s, %s)", TestGroup.StringOpt, wantStr)
+		}
+		init = true
+	})
+	_, err := p.ParseArgs([]string{"-s", wantStr})
+	if err != nil {
+		t.Error(err)
+	}
+	if !init {
+		t.Errorf("!init")
+	}
+}
